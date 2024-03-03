@@ -9,11 +9,17 @@
 </head>
 <body class="bg-white text-black">
     <div class="container mx-auto px-4">
-        <h1 class="text-4xl font-bold my-4">Lambda Calc</h1>
-        <input type="text" id="lambdaInput" placeholder="Enter a lambda function" class="border-2 border-gray-300 p-2 w-full">
-        <button onclick="processLambda()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-        <div id="steps"></div>
-        <div id="result" class="mt-4"></div>
+        <h1 class="text-4xl font-bold my-4 mt-6">Lambda Calc</h1>
+        <div class="flex items-center">
+            <input type="text" id="lambdaInput" placeholder="Enter a lambda function such as: ((&#955;u.&#955;x.(u x) y) z)" class="border-2 border-gray-300 p-2 flex-grow mt-2 font-mono">
+            <button onclick="processLambda()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded mt-auto ml-2">Submit</button>
+        </div>
+        <div class="mt-4">
+            <h3 class="text-2xl font-bold">Steps:</h3><div id="steps" class="font-mono"></div>
+        </div>
+        <div class="mt-4">
+            <h3 class="text-2xl font-bold">Results:</h3><div id="result" class="font-mono"></div>
+        </div>
     </div>
 </body>
 </html>

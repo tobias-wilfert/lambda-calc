@@ -45,13 +45,13 @@ function reduce(expr, steps = []) {
         case 'app':
             if (expr.left.type === 'fun') {
                 const substituted = substitute(expr.left.variable, expr.right, expr.left.body);
-                steps.push('&#955;' + expr.left.variable.value + '.' + astToString(expr.left.body) + ' => ' + astToString(substituted));
+                steps.push('&#955;' + expr.left.variable.value + '.' + astToString(expr.left.body) + '\t&rarr;\t' + astToString(substituted));
                 return reduce(substituted, steps);
             } else {
                 const reducedLeft = reduce(expr.left, steps);
                 if (reducedLeft.expr.type === 'fun') {
                     const substituted = substitute(reducedLeft.expr.variable, expr.right, reducedLeft.expr.body);
-                    steps.push('&#955;' + reducedLeft.expr.variable.value + '.' + astToString(reducedLeft.expr.body) + ' => ' + astToString(substituted));
+                    steps.push('&#955;' + reducedLeft.expr.variable.value + '.' + astToString(reducedLeft.expr.body) + '\t&rarr;\t' + astToString(substituted));
                     return reduce(substituted, steps);
                 } else {
                     const reducedRight = reduce(expr.right, steps);
@@ -77,8 +77,8 @@ function processLambda() {
     try {
         var result = parser.parse(input);
         var reduction = reduce(result);
-        document.getElementById('result').innerHTML = 'Result:<br>' + astToString(reduction.expr);
-        document.getElementById('steps').innerHTML = 'Steps:<br> ' + reduction.steps.join('<br>');
+        document.getElementById('result').innerHTML = astToString(reduction.expr).replace(/ /g, '<span class="text-gray-300">_</span>');;
+        document.getElementById('steps').innerHTML = reduction.steps.join('<br>').replace(/ /g, '<span class="text-gray-300">_</span>');;
     } catch (e) {
         document.getElementById('result').innerHTML = 'Error: ' + e.message;
     }
