@@ -181,10 +181,10 @@ function peg$parse(input, options) {
   var peg$c2 = "(";
   var peg$c3 = ")";
 
-  var peg$r0 = /^[a-z]/;
+  var peg$r0 = /^[a-zA-z0-9']/;
   var peg$r1 = /^[ \t\n\r]/;
 
-  var peg$e0 = peg$classExpectation([["a", "z"]], false, false);
+  var peg$e0 = peg$classExpectation([["a", "z"], ["A", "z"], ["0", "9"], "'"], false, false);
   var peg$e1 = peg$literalExpectation("\u03BB", false);
   var peg$e2 = peg$literalExpectation(".", false);
   var peg$e3 = peg$literalExpectation("(", false);
