@@ -9,6 +9,14 @@ _ "whitespace"
   = [ \t\n\r]*
 */
 
+let variableCounter = 0;
+function generateNewVariable() {
+    return 'a' + variableCounter++;
+}
+
+/**
+ * Checks if a variable is free in an expression.
+ */
 function isVariableFreeIn(variable, expr) {
     switch (expr.type) {
         case 'var':
@@ -20,13 +28,20 @@ function isVariableFreeIn(variable, expr) {
     }
 }
 
+/**
+ * Substitutes occurrences of a variable with a given value in an expression.
+ */
 function substitute(variable, value, expr) {
     switch (expr.type) {
         case 'var':
             return expr.value === variable.value ? value : expr;
         case 'fun':
-            if (expr.variable.value === variable.value || isVariableFreeIn(expr.variable, value)) {
+            if (expr.variable.value === variable.value) {
                 return expr;
+            } else if (isVariableFreeIn(expr.variable, value)) {
+                let newVar = generateNewVariable();
+                let newBody = substitute(expr.variable, { type: 'var', value: newVar }, expr.body);
+                return { type: 'fun', variable: { type: 'var', value: newVar }, body: substitute(variable, value, newBody) };
             } else {
                 return { type: 'fun', variable: expr.variable, body: substitute(variable, value, expr.body) };
             }
@@ -35,6 +50,10 @@ function substitute(variable, value, expr) {
     }
 }
 
+
+/**
+ * Reduces an expression in the lambda calculus.
+ */
 function reduce(expr, steps = []) {
     switch (expr.type) {
         case 'var':
@@ -45,13 +64,21 @@ function reduce(expr, steps = []) {
         case 'app':
             if (expr.left.type === 'fun') {
                 const substituted = substitute(expr.left.variable, expr.right, expr.left.body);
-                steps.push('&#955;' + expr.left.variable.value + '.' + astToString(expr.left.body) + '\t&rarr;\t' + astToString(substituted));
+
+                steps.push(lambda_expression.replace(astToString(expr.left), `<u>${astToString(expr.left)}</u>`));
+                lambda_expression = lambda_expression.replace(astToString(expr), astToString(substituted));
+                
                 return reduce(substituted, steps);
             } else {
                 const reducedLeft = reduce(expr.left, steps);
                 if (reducedLeft.expr.type === 'fun') {
                     const substituted = substitute(reducedLeft.expr.variable, expr.right, reducedLeft.expr.body);
-                    steps.push('&#955;' + reducedLeft.expr.variable.value + '.' + astToString(reducedLeft.expr.body) + '\t&rarr;\t' + astToString(substituted));
+                    
+                    temp_expr = {...expr};
+                    temp_expr.left = reducedLeft.expr;
+                    steps.push(lambda_expression.replace(astToString(reducedLeft.expr), `<u>${astToString(reducedLeft.expr)}</u>`));
+                    lambda_expression = lambda_expression.replace(astToString(temp_expr), astToString(substituted));
+
                     return reduce(substituted, steps);
                 } else {
                     const reducedRight = reduce(expr.right, steps);
@@ -66,13 +93,13 @@ function astToString(ast) {
         case 'var':
             return ast.value;
         case 'fun':
-            return '&#955;' + ast.variable.value + '.' + astToString(ast.body);
+            return '\u03BB' + ast.variable.value + '.' + astToString(ast.body);
         case 'app':
             return '(' + astToString(ast.left) + ' ' + astToString(ast.right) + ')';
     }
 }
 
-function processLambda() {
+function processLambda() {  
     // TODO: Name these better such that they don't conflict with the global scope
     var input = document.getElementById('lambdaInput').value
     .replace(/_/g, ' ')
@@ -81,12 +108,18 @@ function processLambda() {
     .replace(/TRUE/gi, '\u03BBx8.\u03BBy8.x8')
     .replace(/FALSE/gi, '\u03BBx7.\u03BBy7.y7')
     .replace(/COND/gi, '\u03BBa6.\u03BBb6.\u03BBc6.((c6 a6) b6)');
-    // console.log(input);
+
     try {
         var result = parser.parse(input);
-        var reduction = reduce(result);
+        steps = [input];
+        lambda_expression  = astToString(result);
+        
+        var reduction = reduce(result, steps);
+        steps.push(astToString(reduction.expr));
+        // TODO: Convert back the expressions to the constants
+
         document.getElementById('result').innerHTML = astToString(reduction.expr).replace(/ /g, '<span class="text-gray-300">_</span>');;
-        document.getElementById('steps').innerHTML = reduction.steps.join('<br>').replace(/ /g, '<span class="text-gray-300">_</span>');;
+        document.getElementById('steps').innerHTML = reduction.steps.join('<br>&rarr;\t'); // .replace(/ /g, '<span class="text-gray-300">_</span>');;
     } catch (e) {
         document.getElementById('result').innerHTML = 'Error: ' + e.message;
     }
