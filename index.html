@@ -9,12 +9,12 @@
 </head>
 <body class="bg-white text-black">
     <div class="container mx-auto px-4">
-        <h1 class="text-4xl font-bold my-4 mt-6">Lambda Calc</h1>
+        <h1 class="text-4xl font-bold my-4 mt-6">λambda Calc</h1>
         <h4><i><b>Note:</b> This does not do left-most outer-most consistently.</i></h4>
-        <div class="flex items-center">
+        <form class="flex items-center" onsubmit="event.preventDefault(); processLambda();">
             <input type="text" id="lambdaInput" placeholder="Enter a lambda function such as: ((&#955;u.&#955;x.(u x) y) z)" class="border-2 border-gray-300 p-2 flex-grow mt-2 font-mono">
-            <button onclick="processLambda()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded mt-auto ml-2">Submit</button>
-        </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded mt-auto ml-2">Submit</button>
+        </form>
         <div class="mt-4">
             <h3 class="text-2xl font-bold">Steps:</h3><div id="steps" class="font-mono"></div>
         </div>
